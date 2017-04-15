@@ -27,9 +27,12 @@ Icon?
 
 # nodejs npm modules
 /node_modules
+/client/node_modules
+/server/node_modules
 
 # ZSH Cake plugin cache
 /.cake_task_cache
 
 # Build files
 /build/*
+/client/build/*
