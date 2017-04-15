@@ -1,16 +1,21 @@
 var http = require('http').createServer();
+var ios = require('socket.io-express-session');
 var io = require('socket.io')(http);
+io.use(ios(Session));
 
-io.on('connection', function(socket){
-  //console.log('a user connected');
-});
+io.on('connection', function (socket) {
+	socket.on('isloggedin', function (data) {
+    console.log(data);
 
-io.on('connect', function(socket){
-  console.log('a user connected');
-});
-
-io.on('disconnect', function(socket){
-  console.log('a user disconnected');
+    // test against session authkey
+    if(socket.handshake.session.authkey && data.authkey == socket.handshake.session.authkey) {
+    	socket.emit('isloggedin', { authkey: data.authkey });
+    }
+    else {
+    	// grab authkey from database to compare if no match respond with undefined
+    	socket.emit('isloggedin', { authkey: undefined });
+    }
+  });
 });
 
 http.listen(3000, function(){
