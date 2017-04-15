@@ -186,6 +186,12 @@ module.exports = function (grunt) {
           src: ['node_modules/phaser/build/phaser.min.js'],
           dest: 'build/js/phaser.js'
         } ]
+      },
+      phaserInputMin: {
+        files: [ {
+          src: ['node_modules/@orange-games/phaser-input/build/phaser-input.min.js'],
+          dest: 'build/js/phaser-input.min.js'
+        } ]
       }
     },
 
@@ -213,6 +219,7 @@ module.exports = function (grunt) {
     'copy:images',
     'copy:audio',
     'copy:phaserArcade',
+    'copy:phaserInputMin',
     'connect',
     'open',
     'watch'
@@ -228,6 +235,7 @@ module.exports = function (grunt) {
     'copy:images',
     'copy:audio',
     'copy:phaserArcadeMin',
+    'copy:phaserInputMin',
     'cacheBust',
     'connect',
     'open',
