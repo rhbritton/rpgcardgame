@@ -4,14 +4,19 @@ var io = require('socket.io-client');
 var socket = io('http://localhost:3000');
 
 game.create = function () {
-	socket.emit('isloggedin', { authkey: '83O7FGB22OH2' });
-	socket.on('isloggedin', function(res) {		
-		console.log('response', res)
-	});
-	// socket.on('event', function(data){});
-	// socket.emit('disconnect', function(){});
+	var self = this;
+	self._socket = socket;
 
-	Pages.Login.create.call(this);
+	var authkey = localStorage.getItem('authkey');
+	socket.emit('isloggedin', { authkey: authkey });
+	socket.on('isloggedin', function(res) {
+		console.log('response', res)
+
+		if(!res.authkey)
+			Pages.Login.create.call(self);
+		else
+			Pages.Home.create.call(self);
+	});
 };
 
 game.update = function () {
