@@ -8,6 +8,7 @@ game.create = function () {
 	self._socket = socket;
 
 	var authkey = localStorage.getItem('authkey');
+	console.log(authkey);
 	socket.emit('isloggedin', { authkey: authkey });
 	socket.on('isloggedin', function(res) {
 		console.log('response', res)

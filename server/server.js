@@ -1,60 +1,52 @@
-var http = require('http').createServer();
-var ios = require('socket.io-express-session');
-var io = require('socket.io')(http);
-var session = require("express-session")({
-    secret: "my-secret",
-    resave: true,
-    saveUninitialized: true
-});
-io.use(ios(session));
+var app = require('express')();
+var server = require('http').createServer(app);
+var io = require('socket.io')(server);
+
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/rpgcardgame');
+
+var randomAuthKey = 'V09JV3209JVJ';
 
 io.on('connection', function (socket) {
-	var cookie = socket.request.headers.cookie;
-  var pcookie = connect.utils.parseCookie(cookie);
-  var session_id = pcookie["connect.sid"];
-
 	socket.on('isloggedin', function (data) {
 
-  	if(session_id) {
-	    session.get(session_id, function(err, sess) {
+    // Handle authkey from localStorage
+    console.log(data.authkey);
+    if(data.authkey) {
+      // check data.authkey against database
+      var database = true;
+      if(database) {
+        console.log(socket.handshake.session)
+        socket.handshake.session.user = { authkey: randomAuthKey };
+        socket.handshake.session.save();
+        console.log(2)
+        socket.emit('isloggedin', { authkey: data.authkey });
+      }
+      else {
+        socket.emit('isloggedin', { authkey: undefined });
+      }
+    }
+    else {
+      socket.emit('isloggedin', { authkey: undefined });
+    }
 
-	      // test against session authkey
-	      var sauthkey = socket.get('authkey');
+    // TODO: 
+    // If authkey session exists
+      // check data.authkey against session
+    // else 
+      // check data.authkey against database
+      // if match set session to to authkey and respond with logged in status
 
-		    console.log('data', data);
-		    console.log('session', sauthkey);
-		    if(sauthkey && data.authkey == sauthkey) {
-		    	socket.emit('isloggedin', { authkey: data.authkey });
-		    }
-		    else {
-		    	// grab authkey from database to compare if no match respond with undefined
-		    	socket.emit('isloggedin', { authkey: undefined });
-		    }
-	    })
-	  }
-
-    
+    socket.emit('isloggedin', { authkey: undefined });
   });
 
   socket.on('login', function (data) {
   	console.log(data)
-  	// TODO: check username and password against database with salt
-
-  	// If it passes generate an authkey and store it in both the database and session
-  	var authkey = '2099JFJ03J20FFJ';
-  	if(session_id) {
-	    session.get(session_id, function(err, sess) {
-	      // do whatever you want with sess here
-	      // ...
-	      // if you want to "save" the session for future events
-	      socket.set('authkey', authkey);
-	    })
-	  }
-
-  	socket.emit('login', { authkey: authkey });
+  	
+  	socket.emit('login', { authkey: randomAuthKey });
   });
 });
 
-http.listen(3000, function(){
+server.listen(3000, function(){
   console.log('listening on *:3000');
 });
